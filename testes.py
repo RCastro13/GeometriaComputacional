@@ -56,13 +56,19 @@ def triangulate_polygon(polygon):
 
         frames.append(go.Frame(
             data=[
-                go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='black')),
-                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='green')),
+                go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='magenta')),
+                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='aquamarine')),
+                go.Scatter(x=[p1[0], p2[0], p3[0]], y=[p1[1], p2[1], p3[1]], mode='lines+markers', line=dict(color='red'))
             ],
             name=f'frame{len(frames)}'
         ))
 
         del polygon[ear_index]
+    frames.append(go.Frame(
+            data=[
+                go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='black')),
+                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'))            ]
+        ))
 
 polygon = [
     (3.84375, 6.1728515625), (-0.568359375, 5.9921875), (0.7353515625, 9.197265625),
@@ -76,6 +82,9 @@ polygon = [
 
 verticesx = [vertex[0] for vertex in polygon]
 verticesy = [vertex[1] for vertex in polygon]
+#pequena gambiarra
+verticesx.append(3.84375)
+verticesy.append(6.1728515625)
 
 additionalEdgesX = []
 additionalEdgesY = []
@@ -88,7 +97,7 @@ fig = go.Figure(
     data=[
         go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='black')),
         go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='green')),
-        go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='red'))
+        go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black'))
     ],
     layout=go.Layout(
         xaxis=dict(range=[min(verticesx) - 1, max(verticesx) + 1], autorange=False),
@@ -96,7 +105,7 @@ fig = go.Figure(
         title="Animating Polygon Edges",
         updatemenus=[{
             "buttons": [
-                {"label": "Ear-clipping", "method": "animate", "args": [None, {"frame": {"duration": 2500, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]}
+                {"label": "Ear-clipping", "method": "animate", "args": [None, {"frame": {"duration": 1200, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]}
             ],
             "direction": "left",
             "pad": {"r": 10, "t": 87},
