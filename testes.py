@@ -1,10 +1,8 @@
 import plotly.graph_objects as go
 
-# Verifica se os pontos formam uma curva para a esquerda
 def is_convex(p1, p2, p3):
     return (p2[0] - p1[0]) * (p3[1] - p1[1]) - (p2[1] - p1[1]) * (p3[0] - p1[0]) > 0
 
-# Verifica se o ponto está dentro do triângulo
 def is_point_in_triangle(pt, v1, v2, v3):
     def sign(p1, p2, p3):
         return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
@@ -15,7 +13,6 @@ def is_point_in_triangle(pt, v1, v2, v3):
 
     return ((b1 == b2) and (b2 == b3))
 
-# Verifica se uma dada sequência de 3 pontos forma uma orelha
 def is_ear(polygon, i):
     p1 = polygon[i - 1]
     p2 = polygon[i]
@@ -32,6 +29,41 @@ def is_ear(polygon, i):
 
     return True
 
+def find_ears(polygon):
+    ears = []
+    for i in range(len(polygon)):
+        if is_ear(polygon, i):
+            ears.append(i)
+    return ears
+
+def triangulate_polygon(polygon):
+    polygon = polygon[:]
+
+    while len(polygon) > 3:
+        ears = find_ears(polygon)
+        if not ears:
+            raise ValueError("No ears found. Polygon might be malformed or not simple.")
+
+        ear_index = ears[0]
+        p1 = polygon[ear_index - 1]
+        p2 = polygon[ear_index]
+        p3 = polygon[(ear_index + 1) % len(polygon)]
+
+        additionalEdgesX.append(p1[0])
+        additionalEdgesX.append(p3[0])
+        additionalEdgesY.append(p1[1])
+        additionalEdgesY.append(p3[1])
+
+        frames.append(go.Frame(
+            data=[
+                go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='black')),
+                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='green')),
+            ],
+            name=f'frame{len(frames)}'
+        ))
+
+        del polygon[ear_index]
+
 polygon = [
     (3.84375, 6.1728515625), (-0.568359375, 5.9921875), (0.7353515625, 9.197265625),
     (5.87109375, 8.4716796875), (5.98046875, 9.8125), (9.7734375, 4.330078125),
@@ -39,7 +71,7 @@ polygon = [
     (-2.28515625, 7.859375), (-2.802734375, 7.701171875), (-2.05078125, 5.3076171875),
     (-1.138671875, 5.00390625), (-1.27734375, 4.4296875), (-1.052734375, 3.671875),
     (1.283203125, 1.3623046875), (7.44140625, 2.384765625), (10.6484375, 2.19921875),
-    (11.85546875, 1.689453125), (6.701171875, 7.7724609375), (3.84375, 6.1728515625)
+    (11.85546875, 1.689453125), (6.701171875, 7.7724609375)
 ]
 
 verticesx = [vertex[0] for vertex in polygon]
@@ -49,23 +81,8 @@ additionalEdgesX = []
 additionalEdgesY = []
 
 frames = []
-for i in range(len(verticesx)):
-    if is_ear(polygon, i):
-        additionalEdgesX.append(verticesx[(i-1) % len(polygon)])
-        additionalEdgesX.append(verticesx[(i+1) % len(polygon)])
-        additionalEdgesY.append(verticesy[(i-1) % len(polygon)])
-        additionalEdgesY.append(verticesy[(i+1) % len(polygon)])
 
-    frames.append(go.Frame(
-        data=[
-            go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='black')),
-            go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='green')),
-            go.Scatter(x=[verticesx[i], verticesx[(i + 1) % len(verticesx)], verticesx[(i + 2) % len(verticesx)]],
-                       y=[verticesy[i], verticesy[(i + 1) % len(verticesy)], verticesy[(i + 2) % len(verticesy)]],
-                       mode='lines', line=dict(color='blue'))
-        ],
-        name=f'frame{i}'
-    ))
+triangulate_polygon(polygon)
 
 fig = go.Figure(
     data=[
@@ -104,7 +121,7 @@ fig = go.Figure(
             "len": 0.9,
             "x": 0.1,
             "y": 0,
-            "steps": [{"label": f"{i}", "method": "animate", "args": [["frame{i}"], {"frame": {"duration": 500, "redraw": True}, "mode": "immediate", "transition": {"duration": 500}}]} for i in range(len(verticesx))]
+            "steps": [{"label": f"{i}", "method": "animate", "args": [["frame{i}"], {"frame": {"duration": 500, "redraw": True}, "mode": "immediate", "transition": {"duration": 500}}]} for i in range(len(frames))]
         }]
     ),
     frames=frames
