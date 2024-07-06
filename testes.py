@@ -56,8 +56,8 @@ def triangulate_polygon(polygon):
 
         frames.append(go.Frame(
             data=[
-                go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='magenta')),
-                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='aquamarine')),
+                go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='black')),
+                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='blue')),
                 go.Scatter(x=[p1[0], p2[0], p3[0]], y=[p1[1], p2[1], p3[1]], mode='lines+markers', line=dict(color='red'))
             ],
             name=f'frame{len(frames)}'
@@ -67,7 +67,8 @@ def triangulate_polygon(polygon):
     frames.append(go.Frame(
             data=[
                 go.Scatter(x=verticesx, y=verticesy, mode='lines+markers', line=dict(color='black')),
-                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'))            ]
+                go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'))            
+            ]
         ))
 
 polygon = [
@@ -105,7 +106,16 @@ fig = go.Figure(
         title="Animating Polygon Edges",
         updatemenus=[{
             "buttons": [
-                {"label": "Ear-clipping", "method": "animate", "args": [None, {"frame": {"duration": 1200, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]}
+                {
+                    "label": "Play", 
+                    "method": "animate", 
+                    "args": [None, {"frame": {"duration": 2000, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
+                },
+                {
+                    'label': 'Pause',
+                    'method': 'animate',
+                    'args': [[None], {'frame': {'duration': 0, 'redraw': False}, 'mode': 'immediate', 'transition': {'duration': 0}}]
+                }
             ],
             "direction": "left",
             "pad": {"r": 10, "t": 87},
