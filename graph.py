@@ -1,6 +1,4 @@
-import networkx as nx
 import plotly.graph_objects as go
-import pandas as pd
 
 # Passo 1: Definir o polígono (uma lista de vértices em ordem)
 polygon = [
@@ -41,7 +39,7 @@ def is_ear(polygon, i):
     return True
 
 # Passo 3: Implementar o algoritmo de corte de orelhas
-def ear_clipping_triangulation(polygon, edgesDf, vertexDf):
+def ear_clipping_triangulation(polygon):
     triangles = []
     poly = polygon[:]
     currentEdges = []
@@ -72,60 +70,25 @@ def ear_clipping_triangulation(polygon, edgesDf, vertexDf):
                     erasedEdgesY.append(edge[1])
                 
                 del poly[i]
-                G.add_edge(p1, p3)  # Adiciona a aresta do triângulo no grafo
+                #G.add_edge(p1, p3)  # Adiciona a aresta do triângulo no grafo
                 break
 
     triangles.append((poly[0], poly[1], poly[2]))
     return triangles
 
-# Passo 2: Criar o grafo representando o polígono
-G = nx.Graph()
-for i in range(len(polygon)):
-    G.add_edge(polygon[i], polygon[(i+1) % len(polygon)])
-
-# Criando o DataFrame para os vértices
-vertices = []
-for i, (x, y) in enumerate(polygon):
-    # Índices dos vizinhos (considerando vizinhos diretos)
-    vizinhos = [(i - 1) % len(polygon), (i + 1) % len(polygon)]  # Circular
-    vertices.append({
-        'index': i,
-        'x': x,
-        'y': y,
-        'index_vizinhos': vizinhos,
-        'cor': 'black'  # Você pode definir a cor que desejar
-    })
-
-vertexDf = pd.DataFrame(vertices)
-
-# Criando o DataFrame para as arestas
-arestas = []
-for i in range(len(polygon)):
-    x1, y1 = polygon[i]
-    x2, y2 = polygon[(i + 1) % len(polygon)]  # Aresta até o próximo vértice
-    arestas.append({
-        'index': i,
-        'x1': x1,
-        'y1': y1,
-        'x2': x2,
-        'y2': y2,
-        'cor': 'black'  # Defina a cor desejada
-    })
-
-edgesDf = pd.DataFrame(arestas)
-
 # Passo 4: Executar a triangulação e exibir os resultados
-frames = []
-verticesx = [coord[0] for coord in G.nodes]
-verticesy = [coord[1] for coord in G.nodes]
+
+verticesx = [vertex[0] for vertex in polygon]
+verticesy = [vertex[1] for vertex in polygon]
 verticesx.append(verticesx[0])
 verticesy.append(verticesy[0])
 
+frames = []
 additionalEdgesX = []
 additionalEdgesY = []
 erasedEdgesX = []
 erasedEdgesY = []
-triangles = ear_clipping_triangulation(polygon, edgesDf, vertexDf)
+triangles = ear_clipping_triangulation(polygon)
 
 fig = go.Figure(
     data=[
