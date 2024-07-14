@@ -77,7 +77,7 @@ def ear_clipping_triangulation(polygon):
                 break
 
     triangles.append((poly[0], poly[1], poly[2]))
-    return triangles, len(frames)
+    return triangles
 
 def three_color_triangles(triangles):
     # Cria um dicionário para armazenar a cor de cada ponto
@@ -124,7 +124,7 @@ erasedEdgesY = []
 markedPointsX = []
 markedPointsY = []
 
-triangles, frameNum = ear_clipping_triangulation(polygon)
+triangles = ear_clipping_triangulation(polygon)
 
 erasedEdgesX.clear()
 erasedEdgesY.clear()
@@ -141,38 +141,37 @@ frames.append(go.Frame(
 
 colorMap = three_color_triangles(triangles)
 
-# data = []
-# data.append(go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
-#         text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'))
-# data.append(go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black')))
+data = []
+data.append(go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+        text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'))
+data.append(go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black')))
 
-# for point, colored in colorMap.items():
-#     #print(f"Vértice {point}: {colored}")
-#     if colored == 0:
-#         print("ENTREI NO 0")
-#         data.append(
+for point, colored in colorMap.items():
+    print(f"Vértice {point}: {colored}")
+    if colored == 0:
+        #print("ENTREI NO 0")
+        data.append(
             
-#             go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='red'))
+            go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='red'))
                 
-#         )
-#     elif colored == 1:
-#         print("ENTREI NO 1")
-#         data.append(
-#             go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='green'))
+        )
+    elif colored == 1:
+        #print("ENTREI NO 1")
+        data.append(
+            go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='green'))
             
-#         )
-#     else: 
-#         print("ENTREI NO 2")
-#         data.append(
+        )
+    else: 
+        #print("ENTREI NO 2")
+        data.append(
             
-#             go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='blue'))
-            
-#         )
+            go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='blue'))
+        )
 
-# frames.append(go.Frame(
-#     data=data,
-#     name=f'frame{len(frames)}'
-# ))
+    frames.append(go.Frame(
+        data=data,
+        name=f'frame{len(frames)}'
+    ))
 
 initial_data = [
     go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
