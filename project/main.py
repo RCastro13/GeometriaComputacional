@@ -12,6 +12,22 @@ def readPolygon(caminho):
             vertices.append((x, y))
     return vertices
 
+def combinePolygonAndAdditionalEdges(polygon, additionalEdgesX, additionalEdgesY):
+    combinedEdgesX = []
+    combinedEdgesY = []
+
+    # Adicionar arestas do polígono original
+    for i in range(len(polygon)):
+        combinedEdgesX.extend([polygon[i][0], polygon[(i + 1) % len(polygon)][0], None])
+        combinedEdgesY.extend([polygon[i][1], polygon[(i + 1) % len(polygon)][1], None])
+    
+    # Adicionar arestas adicionais da triangulação
+    for i in range(len(additionalEdgesX) - 1):
+        combinedEdgesX.extend([additionalEdgesX[i], additionalEdgesX[i + 1], None])
+        combinedEdgesY.extend([additionalEdgesY[i], additionalEdgesY[i + 1], None])
+    
+    return combinedEdgesX, combinedEdgesY
+
 polygonTxt = 'polygon.txt'
 polygon = readPolygon(polygonTxt)
 print(polygon)
@@ -26,7 +42,7 @@ erasedEdgesY = []
 
 #realiza a triangulação do polígono
 triangulationFrames, additionalEdgesX, additionalEdgesY, triangles = earClippingTriangulation(polygon)
-
+combinedEdgesX, combinedEdgesY = combinePolygonAndAdditionalEdges(polygon, additionalEdgesX, additionalEdgesY)
 frames = frames + triangulationFrames
 
 #frame de transição
@@ -40,20 +56,22 @@ frames.append(go.Frame(
 ))
 
 #realiza a coloração dos vértices do polígono triangulado
-coloringFrames, colorMap = coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY)
+frames, colorMap = coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY, frames)
 
-frames = frames + coloringFrames
+#frames = frames + coloringFrames
 
 #dá para fazer um dicionario com um texto fixo para cada frame -> associar com o index desse e usar o annotations
 
 #AINDA TEM QUE FAZER A ANIMAÇÃO DOS VERTICES ESCOLHIDOS
 
+
+
 initial_data = [
     go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
                text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
     go.Scatter(x=erasedEdgesX, y=erasedEdgesY, mode='lines', line=dict(color='lightgray'), name='Aresta da Orelha'),
-    go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='blue'), name='Arestas Cortadas'),
-    go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black'))
+    go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'), name='Arestas Cortadas'),
+    go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black')),
 ]
 
 fig = go.Figure(
@@ -78,7 +96,7 @@ fig = go.Figure(
                 {
                     "label": "Play", 
                     "method": "animate", 
-                    "args": [None, {"frame": {"duration": 300, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
+                    "args": [None, {"frame": {"duration": 200, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
                 },
                 {
                     'label': 'Pause',
@@ -114,6 +132,11 @@ fig = go.Figure(
     ),
     frames=frames
 )
+
+# fig.add_trace(
+#     go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+#                text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono')
+# )
 
 fig.show()
 

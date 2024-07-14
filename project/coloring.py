@@ -1,8 +1,10 @@
 import plotly.graph_objects as go
 
-def coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY):
+def coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY, frames):
     verticesx = [vertex[0] for vertex in polygon]
     verticesy = [vertex[1] for vertex in polygon]
+    verticesx.append(verticesx[0])
+    verticesy.append(verticesy[0])
     colorMap = {}
     
     neighbors = {}
@@ -19,37 +21,40 @@ def coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY):
         available_colors = {0, 1, 2} - {colorMap.get(neigh) for neigh in neighbors[point]}
         colorMap[point] = min(available_colors)
 
-    coloringFrames = []
-    data = []
-    data.append(go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
-            text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'))
-    data.append(go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black')))
+        # Reinicializa data em cada iteração
+        # data = []
+        # data.append(go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+        #         text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'))
+        # data.append(go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black')))
+    redVerticesX = []
+    redVerticesY = []
+    greenVerticesX = []
+    greenVerticesY = []
+    blueVerticesX = []
+    blueVerticesY = []
 
-    for point, colored in colorMap.items():
-        print(f"Vértice {point}: {colored}")
-        if colored == 0:
-            #print("ENTREI NO 0")
-            data.append(go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='red')))
-
-        elif colored == 1:
-            #print("ENTREI NO 1")
-            data.append(go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='green')))
-
-        else: 
-            #print("ENTREI NO 2")
-            data.append(
-                go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='blue')))
-
-        coloringFrames.append(go.Frame(
-            data=data,
-            name=f'frame{len(coloringFrames)}'
-        ))
+    for p, colored in colorMap.items():
         
+        if colored == 0:
+            redVerticesX.append(p[0])
+            redVerticesY.append(p[1])
+        elif colored == 1:
+            greenVerticesX.append(p[0])
+            greenVerticesY.append(p[1])
+        else: 
+            blueVerticesX.append(p[0])
+            blueVerticesY.append(p[1])
 
-    # colors = {0: 'red', 1: 'green', 2: 'blue'}
-    # print("Cores dos vértices:")
-    # for point, color in color_map.items():
-    #     print(f"Vértice {point}: {colors[color]}")
-
+        frames.append(go.Frame(
+            data=[#go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+            #                 text=[str(i) for i in range(len(polygon))], textposition='top right', name='Polígono'),
+                    go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='gray')),
+                    go.Scatter(x=redVerticesX, y=redVerticesY, mode='markers', marker=dict(size=10, color='red'), name='Vértices Vermelhos'),
+                    go.Scatter(x=greenVerticesX, y=greenVerticesY, mode='markers', marker=dict(size=10, color='green'), name='Vértices Verdes'),
+                    go.Scatter(x=blueVerticesX, y=blueVerticesY, mode='markers', marker=dict(size=10, color='blue'), name='Vértices Azuis'),
+                    
+            ],
+            name=f'frame{len(frames)}'
+        ))
     
-    return coloringFrames, colorMap
+    return frames, colorMap
