@@ -47,14 +47,13 @@ def coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY, fr
 
         frames.append(go.Frame(
             data=[#go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
-            #                 text=[str(i) for i in range(len(polygon))], textposition='top right', name='Polígono'),
+             #                text=[str(i) for i in range(len(polygon))], textposition='top right', name='Polígono'),
                     go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='gray')),
                     go.Scatter(x=redVerticesX, y=redVerticesY, mode='markers', marker=dict(size=10, color='red'), name='Vértices Vermelhos'),
                     go.Scatter(x=greenVerticesX, y=greenVerticesY, mode='markers', marker=dict(size=10, color='green'), name='Vértices Verdes'),
                     go.Scatter(x=blueVerticesX, y=blueVerticesY, mode='markers', marker=dict(size=10, color='blue'), name='Vértices Azuis'),
-                    
             ],
             name=f'frame{len(frames)}'
         ))
     
-    return frames, colorMap
+    return frames
