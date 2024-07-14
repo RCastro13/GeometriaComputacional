@@ -38,7 +38,7 @@ def plotCameras(colorMap):
     frames.append(go.Frame(
         data=[go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
                 text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
-        go.Scatter(x=verticesLeastColorX, y=verticesLeastColorY, mode='markers', marker=dict(size=20, color=leastColor), name='Câmeras')
+        go.Scatter(x=verticesLeastColorX, y=verticesLeastColorY, mode='markers', marker=dict(size=15, color=leastColor), name='Câmeras')
         ],
         name=f'frame{len(frames)}'
     ))
@@ -58,27 +58,14 @@ def plotCameras(colorMap):
             annotations=[
                 dict(
                     x=0.5,  # Posição x (0.5 significa centro horizontal)
-                    y=1.05,  # Posição y (1.05 é um pouco acima do título)
+                    y=1.1,  # Posição y (1.05 é um pouco acima do título)
                     xref='paper',
                     yref='paper',
-                    text="Clique no Botão Play para entender o algoritmo",  # Texto da anotação
                     showarrow=False,
                     font=dict(size=14)
                 )
             ],
             updatemenus=[{
-                "buttons": [
-                    {
-                        "label": "Play", 
-                        "method": "animate", 
-                        "args": [None, {"frame": {"duration": 1000, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
-                    },
-                    {
-                        'label': 'Pause',
-                        'method': 'animate',
-                        'args': [[None], {'frame': {'duration': 0, 'redraw': False}, 'mode': 'immediate', 'transition': {'duration': 0}}]
-                    }
-                ],
                 "direction": "left",
                 "pad": {"r": 10, "t": 87},
                 "showactive": False,

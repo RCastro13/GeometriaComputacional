@@ -55,7 +55,7 @@ def triangleVertex():
             annotations=[
                 dict(
                     x=0.5,  # Posição x (0.5 significa centro horizontal)
-                    y=1.05,  # Posição y (1.05 é um pouco acima do título)
+                    y=1.1,  # Posição y (1.05 é um pouco acima do título)
                     xref='paper',
                     yref='paper',
                     text="Clique no Botão Play para entender o algoritmo",  # Texto da anotação
