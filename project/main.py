@@ -2,6 +2,7 @@ from triangulate import *
 from coloring import *
 import plotly.graph_objects as go
 
+#faz a leitura do polígono do arquivo de texto
 def readPolygon(caminho):
     vertices = []
     with open(caminho, 'r') as arquivo:
@@ -23,19 +24,29 @@ frames = []
 erasedEdgesX = []
 erasedEdgesY = []
 
-triangulationFrames, additionalEdgesX, additionalEdgesY, triangles = ear_clipping_triangulation(polygon)
+#realiza a triangulação do polígono
+triangulationFrames, additionalEdgesX, additionalEdgesY, triangles = earClippingTriangulation(polygon)
 
 frames = frames + triangulationFrames
 
+#frame de transição
 frames.append(go.Frame(
     data=[go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'),
                       text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
-          go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines+markers', line=dict(color='black'), name='Arestas da Triangulação')
+          go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines+markers', line=dict(color='black'), name='Arestas da Triangulação'),
+          go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black'))
     ],
     name=f'frame{len(frames)}'
 ))
 
-colorMap = three_color_triangles(triangles)
+#realiza a coloração dos vértices do polígono triangulado
+coloringFrames, colorMap = coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY)
+
+frames = frames + coloringFrames
+
+#dá para fazer um dicionario com um texto fixo para cada frame -> associar com o index desse e usar o annotations
+
+#AINDA TEM QUE FAZER A ANIMAÇÃO DOS VERTICES ESCOLHIDOS
 
 initial_data = [
     go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 

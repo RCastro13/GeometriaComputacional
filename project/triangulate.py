@@ -1,33 +1,35 @@
 import plotly.graph_objects as go
-# Função para verificar se três pontos são convexos
-def is_convex(a, b, c):
+
+#verifica se a, b e c são pontos convexos
+def convex(a, b, c):
     return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0
 
-def triangle_area(a, b, c):
+#calcula a área do triângulo
+def areaTriangle(a, b, c):
     return abs((a[0]*b[1] + b[0]*c[1] + c[0]*a[1]) - (a[1]*b[0] + b[1]*c[0] + c[1]*a[0])) / 2
 
-def is_point_in_triangle(p, a, b, c):
-    # Usa o método da área para verificar
-    area_orig = triangle_area(a, b, c)
-    area1 = triangle_area(p, b, c)
-    area2 = triangle_area(p, a, c)
-    area3 = triangle_area(p, a, b)
+#verifica se um ponto está dentro do triângulo
+def pointInTriangle(p, a, b, c):
+    area_orig = areaTriangle(a, b, c)
+    area1 = areaTriangle(p, b, c)
+    area2 = areaTriangle(p, a, c)
+    area3 = areaTriangle(p, a, b)
     return abs(area_orig - (area1 + area2 + area3)) < 1e-10
 
-# Função auxiliar para verificar se três pontos formam uma orelha
-def is_ear(polygon, i):
+#verifica se três pontos formam uma orelha
+def isEar(polygon, i):
     a, b, c = polygon[i-1], polygon[i], polygon[(i+1) % len(polygon)]
-    # Verifica se b é um vértice convexo
-    if not is_convex(a, b, c):
+
+    if not convex(a, b, c):
         return False
-    # Verifica se nenhum outro vértice está dentro do triângulo abc
+
     for p in polygon:
-        if p not in (a, b, c) and is_point_in_triangle(p, a, b, c):
+        if p not in (a, b, c) and pointInTriangle(p, a, b, c):
             return False
     return True
 
-# Passo 3: Implementar o algoritmo de corte de orelhas
-def ear_clipping_triangulation(polygon):
+#aplica o algoritmo de corte de orelhas e sua animação
+def earClippingTriangulation(polygon):
     triangles = []
     triangulationFrames = []
     poly = polygon[:]
@@ -44,7 +46,7 @@ def ear_clipping_triangulation(polygon):
     erased = []
     while len(poly) > 3:
         for i in range(len(poly)):
-            if is_ear(poly, i):
+            if isEar(poly, i):
                 p1, p2, p3 = poly[i-1], poly[i], poly[(i+1) % len(poly)]
                 triangles.append((p1, p2, p3))
                 edgesArray = [p1, p2, p3]
@@ -64,7 +66,7 @@ def ear_clipping_triangulation(polygon):
                                    text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
                         go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='blue'), name='Aresta da Orelha'),
                         go.Scatter(x=erasedEdgesX, y=erasedEdgesY, mode='lines', line=dict(color='lightgray'), name='Arestas Cortadas'),
-                        go.Scatter(x=markedPointsX, y=markedPointsY, mode='markers+lines', line=dict(color='red'), name='Vértices da Iteração'),            
+                        go.Scatter(x=markedPointsX, y=markedPointsY, mode='markers+lines', line=dict(color='red'), name='Arestas da Iteração'),            
                     ],
                     name=f'frame{len(triangulationFrames)}'
                 ))
@@ -76,10 +78,18 @@ def ear_clipping_triangulation(polygon):
                     
                 
                 del poly[i]
-                #G.add_edge(p1, p3)  # Adiciona a aresta do triângulo no grafo
                 break
+            
+    triangulationFrames.append(go.Frame(
+        data=[
+            go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+                        text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
+            go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'), name='Aresta da Orelha'),
+            go.Scatter(x=erasedEdgesX, y=erasedEdgesY, mode='lines', line=dict(color='lightgray'), name='Arestas Cortadas'),
+            go.Scatter(x=markedPointsX, y=markedPointsY, mode='markers+lines', line=dict(color='red'), name='Arestas da Iteração'),         
+        ],
+        name=f'frame{len(triangulationFrames)}'
+    ))
 
     triangles.append((poly[0], poly[1], poly[2]))
     return triangulationFrames, additionalEdgesX, additionalEdgesY, triangles
-
-frames = []
