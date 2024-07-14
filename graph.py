@@ -42,7 +42,6 @@ def is_ear(polygon, i):
 def ear_clipping_triangulation(polygon):
     triangles = []
     poly = polygon[:]
-    currentEdges = []
     while len(poly) > 3:
         for i in range(len(poly)):
             if is_ear(poly, i):
@@ -54,6 +53,8 @@ def ear_clipping_triangulation(polygon):
                     if edge != p2:
                         additionalEdgesX.append(edge[0])
                         additionalEdgesY.append(edge[1])
+                    markedPointsX.append(edge[0])
+                    markedPointsY.append(edge[1])
 
                 frames.append(go.Frame(
                     data=[
@@ -61,10 +62,12 @@ def ear_clipping_triangulation(polygon):
                                    text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
                         go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='blue'), name='Aresta da Orelha'),
                         go.Scatter(x=erasedEdgesX, y=erasedEdgesY, mode='lines', line=dict(color='lightgray'), name='Arestas Cortadas'),
-                        go.Scatter(x=[p1[0], p2[0], p3[0]], y=[p1[1], p2[1], p3[1]], mode='markers+lines', line=dict(color='red'), name='Vértices da Iteração'),            
+                        go.Scatter(x=markedPointsX, y=markedPointsY, mode='markers+lines', line=dict(color='red'), name='Vértices da Iteração'),            
                     ],
                     name=f'frame{len(frames)}'
                 ))
+                markedPointsX.clear()
+                markedPointsY.clear()
                 for edge in edgesArray:
                     erasedEdgesX.append(edge[0])
                     erasedEdgesY.append(edge[1])
@@ -74,7 +77,37 @@ def ear_clipping_triangulation(polygon):
                 break
 
     triangles.append((poly[0], poly[1], poly[2]))
-    return triangles
+    return triangles, len(frames)
+
+def three_color_triangles(triangles):
+    # Cria um dicionário para armazenar a cor de cada ponto
+    color_map = {}
+    
+    # Cria um dicionário para armazenar os vizinhos de cada ponto
+    neighbors = {}
+    
+    # Adiciona os vizinhos de cada ponto com base nos triângulos
+    for triangle in triangles:
+        for i in range(3):
+            point = triangle[i]
+            if point not in neighbors:
+                neighbors[point] = set()
+            neighbors[point].add(triangle[(i+1)%3])
+            neighbors[point].add(triangle[(i+2)%3])
+    
+    # Aplica a coloração de 3 cores
+    
+    for point in neighbors:
+        available_colors = {0, 1, 2} - {color_map.get(neigh) for neigh in neighbors[point]}
+        color_map[point] = min(available_colors)
+        
+
+    # colors = {0: 'red', 1: 'green', 2: 'blue'}
+    # print("Cores dos vértices:")
+    # for point, color in color_map.items():
+    #     print(f"Vértice {point}: {colors[color]}")
+    
+    return color_map
 
 # Passo 4: Executar a triangulação e exibir os resultados
 
@@ -88,16 +121,70 @@ additionalEdgesX = []
 additionalEdgesY = []
 erasedEdgesX = []
 erasedEdgesY = []
-triangles = ear_clipping_triangulation(polygon)
+markedPointsX = []
+markedPointsY = []
+
+triangles, frameNum = ear_clipping_triangulation(polygon)
+
+erasedEdgesX.clear()
+erasedEdgesY.clear()
+markedPointsX.clear()
+markedPointsY.clear()
+
+frames.append(go.Frame(
+    data=[go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'),
+                      text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
+          go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines+markers', line=dict(color='black'), name='Arestas da Triangulação')
+    ],
+    name=f'frame{len(frames)}'
+))
+
+colorMap = three_color_triangles(triangles)
+
+# data = []
+# data.append(go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+#         text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'))
+# data.append(go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black')))
+
+# for point, colored in colorMap.items():
+#     #print(f"Vértice {point}: {colored}")
+#     if colored == 0:
+#         print("ENTREI NO 0")
+#         data.append(
+            
+#             go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='red'))
+                
+#         )
+#     elif colored == 1:
+#         print("ENTREI NO 1")
+#         data.append(
+#             go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='green'))
+            
+#         )
+#     else: 
+#         print("ENTREI NO 2")
+#         data.append(
+            
+#             go.Scatter(x=[point[0]], y=[point[1]], mode='markers', marker=dict(size=10, color='blue'))
+            
+#         )
+
+# frames.append(go.Frame(
+#     data=data,
+#     name=f'frame{len(frames)}'
+# ))
+
+initial_data = [
+    go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+               text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
+    go.Scatter(x=erasedEdgesX, y=erasedEdgesY, mode='lines', line=dict(color='lightgray'), name='Aresta da Orelha'),
+    go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='blue'), name='Arestas Cortadas'),
+    go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black'))
+]
+
 
 fig = go.Figure(
-    data=[
-        go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
-                   text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
-        go.Scatter(x=erasedEdgesX, y=erasedEdgesY, mode='lines', line=dict(color='lightgray'), name='Aresta da Orelha'),
-        go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='blue'), name='Arestas Cortadas'),
-        go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black'))
-    ],
+    data=initial_data,
     layout=go.Layout(
         xaxis=dict(range=[min(verticesx) - 1, max(verticesx) + 1], autorange=False),
         yaxis=dict(range=[min(verticesy) - 1, max(verticesy) + 1], autorange=False),
@@ -118,7 +205,7 @@ fig = go.Figure(
                 {
                     "label": "Play", 
                     "method": "animate", 
-                    "args": [None, {"frame": {"duration": 2000, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
+                    "args": [None, {"frame": {"duration": 300, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
                 },
                 {
                     'label': 'Pause',
