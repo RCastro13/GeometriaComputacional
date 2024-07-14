@@ -68,7 +68,7 @@ def triangleVertex():
                     {
                         "label": "Play", 
                         "method": "animate", 
-                        "args": [None, {"frame": {"duration": 200, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
+                        "args": [None, {"frame": {"duration": 1000, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
                     },
                     {
                         'label': 'Pause',
@@ -91,7 +91,7 @@ def triangleVertex():
                 "xanchor": "left",
                 "currentvalue": {
                     "font": {"size": 20},
-                    "prefix": "Frame:",
+                    "prefix": "Frame Timeline:",
                     "visible": True,
                     "xanchor": "right"
                 },
@@ -99,7 +99,7 @@ def triangleVertex():
                 "len": 0.9,
                 "x": 0.1,
                 "y": 0,
-                "steps": [{"label": f"{i}", "method": "animate", "args": [["frame{i}"], {"frame": {"duration": 500, "redraw": True}, "mode": "immediate", "transition": {"duration": 500}}]} for i in range(len(frames))]
+                "steps": [{"label": f"{i}", "method": "animate", "args": [[frames[i]], {"frame": {"duration": 500, "redraw": True}, "mode": "immediate", "transition": {"duration": 500}}]} for i in range(len(frames))]
             }]
         ),
         frames=frames

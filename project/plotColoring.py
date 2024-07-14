@@ -14,8 +14,7 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
     frames, colorMap = coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY, frames)
 
     initial_data = [
-        go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
-                text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
+        go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black')),
         go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'), name='Arestas Cortadas'),
         go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black')),
     ]
@@ -45,7 +44,7 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
                     {
                         "label": "Play", 
                         "method": "animate", 
-                        "args": [None, {"frame": {"duration": 200, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
+                        "args": [None, {"frame": {"duration": 1000, "redraw": True}, "fromcurrent": True, "mode": "immediate"}]
                     },
                     {
                         'label': 'Pause',
@@ -68,7 +67,7 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
                 "xanchor": "left",
                 "currentvalue": {
                     "font": {"size": 20},
-                    "prefix": "Frame:",
+                    "prefix": "Frame Timeline:",
                     "visible": True,
                     "xanchor": "right"
                 },
@@ -76,15 +75,14 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
                 "len": 0.9,
                 "x": 0.1,
                 "y": 0,
-                "steps": [{"label": f"{i}", "method": "animate", "args": [["frame{i}"], {"frame": {"duration": 500, "redraw": True}, "mode": "immediate", "transition": {"duration": 500}}]} for i in range(len(frames))]
+                "steps": [{"label": f"{i}", "method": "animate", "args": [[frames[i]], {"frame": {"duration": 500, "redraw": True}, "mode": "immediate", "transition": {"duration": 500}}]} for i in range(len(frames))]
             }]
         ),
         frames=frames
     )
 
     fig.add_trace(
-        go.Scatter(x=verticesx, y=verticesy, mode='lines+text', line=dict(color='black'), 
-                text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono')
+        go.Scatter(x=verticesx, y=verticesy, mode='lines+text', line=dict(color='black'))
     )
 
     #fig.show()
