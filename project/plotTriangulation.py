@@ -2,6 +2,7 @@ from triangulate import *
 from coloring import *
 import plotly.graph_objects as go
 
+#faz a leitura do polígono do arquivo de texto
 def readPolygon(caminho):
         vertices = []
         with open(caminho, 'r') as arquivo:
@@ -10,11 +11,10 @@ def readPolygon(caminho):
                 x, y = float(coordenadas[0]), float(coordenadas[1])
                 vertices.append((x, y))
         return vertices
-#faz a leitura do polígono do arquivo de texto
+
 def triangleVertex():
     polygonTxt = 'polygon.txt'
     polygon = readPolygon(polygonTxt)
-    print(polygon)
 
     verticesx = [vertex[0] for vertex in polygon]
     verticesy = [vertex[1] for vertex in polygon]

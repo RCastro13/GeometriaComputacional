@@ -1,5 +1,7 @@
 from plotTriangulation import *
 from plotColoring import *
+from plotCameras import *
 
 additionalEdgesX, additionalEdgesY, triangles = triangleVertex()
-plotColoring(additionalEdgesX, additionalEdgesY, triangles)
+colorMap = plotColoring(additionalEdgesX, additionalEdgesY, triangles)
+plotCameras(colorMap)

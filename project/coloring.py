@@ -56,4 +56,4 @@ def coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY, fr
             name=f'frame{len(frames)}'
         ))
     
-    return frames
+    return frames, colorMap

@@ -1,34 +1,60 @@
+import plotly.graph_objects as go
 from plotTriangulation import *
-from coloring import *
 
-def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
+def plotCameras(colorMap):
     polygonTxt = 'polygon.txt'
     polygon = readPolygon(polygonTxt)
-
     verticesx = [vertex[0] for vertex in polygon]
     verticesy = [vertex[1] for vertex in polygon]
     verticesx.append(verticesx[0])
     verticesy.append(verticesy[0])
 
-    frames = []
-    frames, colorMap = coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY, frames)
+    #encontrando a cor que possui menos vértices
+    corCount = {}
+    for cor in colorMap.values():
+        if cor in corCount:
+            corCount[cor] += 1
+        else:
+            corCount[cor] = 1
+
+    leastColor = min(corCount, key=corCount.get)
+    verticesLeastColorX = []
+    verticesLeastColorY = []
+
+    for vertice, cor in colorMap.items():
+        if cor == leastColor:
+            index = polygon.index(vertice) 
+            verticesLeastColorX.append(polygon[index][0])
+            verticesLeastColorY.append(polygon[index][1])
+
+    if leastColor == 0:
+        leastColor = 'red'
+    elif leastColor == 1:
+        leastColor = 'green'
+    else:
+        leastColor = 'blue'
+
+    frames=[]
+    frames.append(go.Frame(
+        data=[go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
+                text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
+        go.Scatter(x=verticesLeastColorX, y=verticesLeastColorY, mode='markers', marker=dict(size=20, color=leastColor), name='Câmeras')
+        ],
+        name=f'frame{len(frames)}'
+    ))
 
     initial_data = [
         go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
                 text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono'),
-        go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'), name='Arestas Cortadas'),
         go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black')),
     ]
-
-    trace = go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), 
-                        text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono')
     
     fig = go.Figure(
-        data=[trace] + initial_data,
+        data=initial_data,
         layout=go.Layout(
             xaxis=dict(range=[min(verticesx) - 1, max(verticesx) + 1], autorange=False),
             yaxis=dict(range=[min(verticesy) - 1, max(verticesy) + 1], autorange=False),
-            title="3-Coloração do Polígono",
+            title="Vértices das Câmeras",
             annotations=[
                 dict(
                     x=0.5,  # Posição x (0.5 significa centro horizontal)
@@ -82,13 +108,8 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
         frames=frames
     )
 
-    fig.add_trace(
-        go.Scatter(x=verticesx, y=verticesy, mode='lines+text', line=dict(color='black'), 
-                text=[str(i) for i in range(len(polygon))] + [str(0)], textposition='top right', name='Polígono')
-    )
-
     #fig.show()
 
-    fig.write_html("coloring.html")
+    fig.write_html("cameras.html")
 
-    return colorMap
+    return
