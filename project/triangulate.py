@@ -1,14 +1,11 @@
 import plotly.graph_objects as go
 
-#verifica se a, b e c são pontos convexos
 def convex(a, b, c):
     return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) > 0
 
-#calcula a área do triângulo
 def areaTriangle(a, b, c):
     return abs((a[0]*b[1] + b[0]*c[1] + c[0]*a[1]) - (a[1]*b[0] + b[1]*c[0] + c[1]*a[0])) / 2
 
-#verifica se um ponto está dentro do triângulo
 def pointInTriangle(p, a, b, c):
     area_orig = areaTriangle(a, b, c)
     area1 = areaTriangle(p, b, c)
@@ -16,7 +13,6 @@ def pointInTriangle(p, a, b, c):
     area3 = areaTriangle(p, a, b)
     return abs(area_orig - (area1 + area2 + area3)) < 1e-10
 
-#verifica se três pontos formam uma orelha
 def isEar(polygon, i):
     a, b, c = polygon[i-1], polygon[i], polygon[(i+1) % len(polygon)]
 
@@ -76,7 +72,6 @@ def earClippingTriangulation(polygon):
                     erasedEdgesX.append(edge[0])
                     erasedEdgesY.append(edge[1])
                     
-                
                 del poly[i]
                 break
             

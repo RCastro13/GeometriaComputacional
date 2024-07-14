@@ -14,7 +14,7 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
     frames, colorMap = coloringTriangles(triangles, polygon, additionalEdgesX, additionalEdgesY, frames)
 
     initial_data = [
-        go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black')),
+        go.Scatter(x=verticesx, y=verticesy, mode='lines+markers+text', line=dict(color='black'), name='Polígono'),
         go.Scatter(x=additionalEdgesX, y=additionalEdgesY, mode='lines', line=dict(color='black'), name='Arestas Cortadas'),
         go.Scatter(x=verticesx + [verticesx[0]], y=verticesy + [verticesy[0]], mode='lines', line=dict(color='black')),
     ]
@@ -30,11 +30,11 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
             title="3-Coloração do Polígono",
             annotations=[
                 dict(
-                    x=0.5,  # Posição x (0.5 significa centro horizontal)
-                    y=1.1,  # Posição y (1.05 é um pouco acima do título)
+                    x=0.5,
+                    y=1.1,
                     xref='paper',
                     yref='paper',
-                    text="Clique no Botão Play para entender o algoritmo",  # Texto da anotação
+                    text="Clique no Botão Play para entender o algoritmo",
                     showarrow=False,
                     font=dict(size=14)
                 )
@@ -82,7 +82,7 @@ def plotColoring(additionalEdgesX, additionalEdgesY, triangles):
     )
 
     fig.add_trace(
-        go.Scatter(x=verticesx, y=verticesy, mode='lines+text', line=dict(color='black'))
+        go.Scatter(x=verticesx, y=verticesy, mode='lines+text', line=dict(color='black'), name='Polígono')
     )
 
     #fig.show()

@@ -55,16 +55,6 @@ def plotCameras(colorMap):
             xaxis=dict(range=[min(verticesx) - 1, max(verticesx) + 1], autorange=False),
             yaxis=dict(range=[min(verticesy) - 1, max(verticesy) + 1], autorange=False),
             title="Vértices das Câmeras",
-            annotations=[
-                dict(
-                    x=0.5,  # Posição x (0.5 significa centro horizontal)
-                    y=1.1,  # Posição y (1.05 é um pouco acima do título)
-                    xref='paper',
-                    yref='paper',
-                    showarrow=False,
-                    font=dict(size=14)
-                )
-            ],
             updatemenus=[{
                 "direction": "left",
                 "pad": {"r": 10, "t": 87},
